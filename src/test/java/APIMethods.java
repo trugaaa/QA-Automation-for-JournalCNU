@@ -48,9 +48,13 @@ public class APIMethods {
         return INVALID_AUTH_TOKEN;
     }
 
-    public static boolean isBodyNotHasKey(Response response, String notToHasString) {
+    public static Boolean isBodyNotHasKey(Response response, String notToHasString) {
         JsonPath jsonPathValidator = response.jsonPath();
         return jsonPathValidator.get(notToHasString) == null;
+    }
+    public static Boolean bodyKeyEqualsValue(Response response,String key, String value) {
+        JsonPath jsonPathValidator = response.jsonPath();
+        return jsonPathValidator.get(key) == value;
     }
 
     public static String getAuthUserToken() {

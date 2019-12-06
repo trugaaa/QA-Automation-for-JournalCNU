@@ -19,7 +19,8 @@ public class TestAPI {
         Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONForSuccessRegistation().toString())
                 .post(APIMethods.targetURL("/registration"));
         APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForSuccessRegistation());
-        assertEquals(response.getStatusCode(),201);
+        assertEquals(response.getStatusCode(),200);
+        assertTrue(APIMethods.bodyKeyEqualsValue(response,"data", "true"));
     }
 
     @POST
