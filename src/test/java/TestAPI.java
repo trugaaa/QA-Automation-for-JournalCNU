@@ -120,7 +120,7 @@ public class TestAPI {
         Response response = RestAssured.given().contentType(ContentType.JSON).header("Authorization", APIMethods.getInvalidAuthToken())
                 .get(APIMethods.targetURL("/schedule"));
         APIMethods.responseWrite(response);
-        assertEquals(response.getStatusCode(),403);
+        assertEquals(response.getStatusCode(),401);
         assertTrue(APIMethods.isBodyHasKey(response,"data"));
 
     }
@@ -149,7 +149,7 @@ public class TestAPI {
         Response response = RestAssured.given().contentType(ContentType.JSON).header("Authorization", APIMethods.getInvalidAuthToken())
                 .get(APIMethods.targetURL("/schedule/time"));
         APIMethods.responseWrite(response);
-        assertEquals(response.getStatusCode(),403);
+        assertEquals(response.getStatusCode(),401);
         assertTrue(APIMethods.isBodyNotHasKey(response,"data"));
     }
 
@@ -177,7 +177,7 @@ public class TestAPI {
         Response response = RestAssured.given().contentType(ContentType.JSON).header("Authorization", APIMethods.getInvalidAuthToken())
                 .get(APIMethods.targetURL("/users"));
         APIMethods.responseWrite(response);
-        assertEquals(response.getStatusCode(),403);
+        assertEquals(response.getStatusCode(),401);
         assertTrue(APIMethods.isBodyNotHasKey(response,"data"));
     }
 
@@ -205,13 +205,12 @@ public class TestAPI {
         Response response = RestAssured.given().contentType(ContentType.JSON).header("Authorization", APIMethods.getInvalidAuthToken())
                 .get(APIMethods.targetURL("/users/current"));
         APIMethods.responseWrite(response);
-        assertEquals(response.getStatusCode(),403);
+        assertEquals(response.getStatusCode(),401);
         assertTrue(APIMethods.isBodyHasKey(response,"data"));
     }
 
-//TODO GET //registry
-@POST
-@Path("/users")
+@GET
+@Path("/registry")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
@@ -226,8 +225,8 @@ public void getRegistrySuccess()
     assertTrue(APIMethods.isBodyHasKey(response,"data"));
 }
 
-    @POST
-    @Path("/users")
+    @GET
+    @Path("/registry")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
@@ -241,8 +240,8 @@ public void getRegistrySuccess()
         assertTrue(APIMethods.isBodyHasKey(response,"data"));
     }
 
-    @POST
-    @Path("/users")
+    @GET
+    @Path("/registry")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "registry-controller")
@@ -255,11 +254,38 @@ public void getRegistrySuccess()
         assertEquals(response.getStatusCode(),401);
     }
 
+    @GET
+    @Path("/subjects")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
+    public void getSubjectsSuccess()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .get(APIMethods.targetURL("/subjects"));
+        APIMethods.responseWrite(response);
+        assertEquals(response.getStatusCode(),200);
+    }
+
+    @GET
+    @Path("/subjects")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "registry-controller")
+    public void getSubjectsWithInvalidToken()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getInvalidAuthToken())
+                .get(APIMethods.targetURL("/subjects"));
+        APIMethods.responseWrite(response);
+        assertEquals(response.getStatusCode(),401);
+    }
+
 
     //TODO POST //registry
 
-//TODO POST /users/id
-
+    //TODO POST /users/id
 
     //TODO DELETE/users/id
 }

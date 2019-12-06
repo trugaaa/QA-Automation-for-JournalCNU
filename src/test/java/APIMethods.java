@@ -8,7 +8,7 @@ public class APIMethods {
     private static final String INVALID_AUTH_TOKEN = "Bearer_eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaW5kMHduZXIiLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE1NzQ1Mzc0NDcsImV4cCI6MTU3NTUzNzQ0N30.XnSTmUnm_iNVDakDrGjJtH8wI0_dbRAw1yDxiD_Zn9_";
     private static String authUserToken;
 
-    private static final String DATE_OF_REGISTRY = "?date=2019-12-06";
+    private static final String DATE_OF_REGISTRY = "?date=2019-12-05";
 
     public static Boolean isBodyHasKey(Response response, String toHasString)
     {
