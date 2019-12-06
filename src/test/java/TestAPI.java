@@ -71,6 +71,19 @@ public class TestAPI {
         assertTrue(APIMethods.isBodyHasKey(response,"data.token"));
         assertTrue(APIMethods.setAuthUserToken(APIMethods.takeKeyValue(response,"data.token")));
     }
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "login-controller")
+    public void loginMonitorSuccess() {
+        Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getSuccessfulMonitorAuthorization().toString()).post(APIMethods.targetURL("/login"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getSuccessfulMonitorAuthorization());
+        assertEquals(response.getStatusCode(),200);
+        assertTrue(APIMethods.isBodyHasKey(response,"data.token"));
+        assertTrue(APIMethods.setAuthMonitorToken(APIMethods.takeKeyValue(response,"data.token")));
+    }
+
 
     @POST
     @Path("/login")
@@ -213,17 +226,61 @@ public class TestAPI {
 @Path("/registry")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
+@Test (groups = "registry-controller", dependsOnMethods = "loginMonitorSuccess")
 public void getRegistrySuccess()
 {
     Response response = RestAssured.given().contentType(ContentType.JSON)
-            .param("date",APIMethods.getDateOfRegistry())
-            .header("Authorization", APIMethods.getAuthAdminToken())
+            .header("Authorization", APIMethods.getAuthMonitorToken())
             .get(APIMethods.targetURL("/registry"));
     APIMethods.responseWrite(response);
     assertEquals(response.getStatusCode(),200);
     assertTrue(APIMethods.isBodyHasKey(response,"data"));
 }
+
+    @POST
+    @Path("/registry")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
+    public void sendRegistryWithInvalidRole()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForRegistrySending().toString())
+                .post(APIMethods.targetURL("/registry"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForRegistrySending());
+        assertEquals(response.getStatusCode(),403);
+    }
+
+    @POST
+    @Path("/registry")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "registry-controller")
+    public void sendRegistrySuccess()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getInvalidAuthToken())
+                .body(JSONObjectAPI.getJSONForRegistrySending().toString())
+                .post(APIMethods.targetURL("/registry"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForRegistrySending());
+        assertEquals(response.getStatusCode(),200);
+    }
+
+    @POST
+    @Path("/registry")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "registry-controller")
+    public void sendRegistryInvalidToken()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getInvalidAuthToken())
+                .body(JSONObjectAPI.getJSONForRegistrySending().toString())
+                .post(APIMethods.targetURL("/registry"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForRegistrySending());
+        assertEquals(response.getStatusCode(),401);
+    }
 
     @GET
     @Path("/registry")
@@ -281,9 +338,6 @@ public void getRegistrySuccess()
         APIMethods.responseWrite(response);
         assertEquals(response.getStatusCode(),401);
     }
-
-
-    //TODO POST //registry
 
     //TODO POST /users/id
 

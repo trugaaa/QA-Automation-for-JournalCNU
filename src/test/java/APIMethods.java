@@ -7,6 +7,7 @@ public class APIMethods {
     private static String authAdminToken;
     private static final String INVALID_AUTH_TOKEN = "Bearer_eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaW5kMHduZXIiLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE1NzQ1Mzc0NDcsImV4cCI6MTU3NTUzNzQ0N30.XnSTmUnm_iNVDakDrGjJtH8wI0_dbRAw1yDxiD_Zn9_";
     private static String authUserToken;
+    private static String authMonitorToken;
 
     private static final String DATE_OF_REGISTRY = "?date=2019-12-05";
 
@@ -69,6 +70,20 @@ public class APIMethods {
 
     public static String getDateOfRegistry() {
         return DATE_OF_REGISTRY;
+    }
+
+    public static String getAuthMonitorToken() {
+        return authMonitorToken;
+    }
+
+    public static Boolean setAuthMonitorToken(String authMonitorToken) {
+      try {
+          APIMethods.authMonitorToken = authMonitorToken;
+          return true;
+      }
+      catch (Exception ex){
+          return false;
+      }
     }
 
     public static void requestResponseWrite(Response response, JSONObject input) {

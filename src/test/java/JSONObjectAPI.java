@@ -15,6 +15,13 @@ public class JSONObjectAPI {
         requestLoginBody.put("password","12345678Zz");
         return requestLoginBody;
     }
+    public static JSONObject getSuccessfulMonitorAuthorization()
+    {
+        JSONObject requestLoginBody = new JSONObject();
+        requestLoginBody.put("username","u1");
+        requestLoginBody.put("password","qwe");
+        return requestLoginBody;
+    }
 
     public static JSONObject getJSONForInvalidAuthorization(){
         JSONObject requestLoginBody = new JSONObject();
@@ -65,6 +72,19 @@ public class JSONObjectAPI {
         body.put("lastName", "Lastname");
         body.put("password", "XXxx1123456");
         body.put("username", "testUsername2");
+        return body;
+    }
+
+    public static JSONObject getJSONForRegistrySending()
+    {
+        JSONArray registryArr = new JSONArray();
+        JSONObject registry = new JSONObject();
+        registry.put("present", false);
+        registry.put("userId", 4);
+        registryArr.put(registry);
+        JSONObject body = new JSONObject();
+        body.put("subjectId", 1);
+        body.put("registry",registryArr);
         return body;
     }
 }
