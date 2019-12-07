@@ -40,7 +40,7 @@ public class TestAPI {
     @Path("/registration")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Test (groups = "registration-controller", dependsOnMethods = "registrationSuccess")
+    @Test (groups = "registration-controller")
     public void registrationWithInUniqueEmail() {
         Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONWithInUniqueEmailForRegistration().toString())
                 .post(APIMethods.targetURL("/registration"));
@@ -64,7 +64,7 @@ public class TestAPI {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Test (groups = "login-controller", dependsOnMethods = "registrationSuccess")
+    @Test (groups = "login-controller")
     public void loginUserSuccess() {
         Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONForSuccessfulUserAuthorization().toString()).post(APIMethods.targetURL("/login"));
         APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForSuccessfulUserAuthorization());
@@ -316,7 +316,7 @@ public void getRegistrySuccess()
     @Path("/subjects")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Test (groups = "registry-controller", dependsOnMethods = "loginAdminSuccess")
+    @Test (groups = "subject-controller", dependsOnMethods = "loginAdminSuccess")
     public void getSubjectsSuccess()
     {
         Response response = RestAssured.given().contentType(ContentType.JSON)
@@ -330,7 +330,7 @@ public void getRegistrySuccess()
     @Path("/subjects")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Test (groups = "registry-controller")
+    @Test(groups = "subject-controller")
     public void getSubjectsWithInvalidToken()
     {
         Response response = RestAssured.given().contentType(ContentType.JSON)
@@ -340,7 +340,122 @@ public void getRegistrySuccess()
         assertEquals(response.getStatusCode(),401);
     }
 
-    //TODO POST /users/id
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updateUserSuccess()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForEditingUser().toString())
+                .post(APIMethods.targetURL("/users/4"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUser());
+        assertEquals(response.getStatusCode(),200);
+    }
 
-    //TODO DELETE/users/id
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updateUserWithInvalidToken()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getInvalidAuthToken())
+                .body(JSONObjectAPI.getJSONForEditingUser().toString())
+                .post(APIMethods.targetURL("/users/4"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUser());
+        assertEquals(response.getStatusCode(),200);
+    }
+
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updateUserWithInUniqueEmail()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForEditingUserInUniqueEmail().toString())
+                .post(APIMethods.targetURL("/users/4"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUserInUniqueEmail());
+        assertEquals(response.getStatusCode(),400);
+    }
+
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updateUserWithInUniqueUsername()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForEditingUserInUniqueUsername().toString())
+                .post(APIMethods.targetURL("/users/4"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUserInUniqueUsername());
+        assertEquals(response.getStatusCode(),400);
+    }
+
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updateUserWithIncorrectRole()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForEditingUserIncorectRole().toString())
+                .post(APIMethods.targetURL("/users/4"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUserIncorectRole());
+        assertEquals(response.getStatusCode(),400);
+    }
+
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess")
+    public void updatingUserNotExists()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .body(JSONObjectAPI.getJSONForEditingUserIncorectRole().toString())
+                .post(APIMethods.targetURL("/users/400000000000"));
+        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForEditingUser());
+        assertEquals(response.getStatusCode(),404);
+    }
+
+    @DELETE
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller")
+    public void deleteUserInvalidToken()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getInvalidAuthToken())
+                .delete(APIMethods.targetURL("/users/4"));
+        APIMethods.responseWrite(response);
+        assertEquals(response.getStatusCode(),403);
+    }
+
+    @DELETE
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Test (groups = "user-controller",dependsOnMethods = "loginAdminSuccess",priority=4)
+    public void deleteUserSuccess()
+    {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .header("Authorization", APIMethods.getAuthAdminToken())
+                .delete(APIMethods.targetURL("/users/4"));
+        APIMethods.responseWrite(response);
+        assertEquals(response.getStatusCode(),200);
+    }
+
 }
