@@ -1,7 +1,14 @@
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+package api;
+
 import static org.testng.Assert.*;
+
+import api.body.LoginData;
+import api.body.RegistrationData;
+import api.body.RegistryData;
+import api.body.UserData;
+import api.data.ApiData;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.*;
@@ -9,8 +16,22 @@ import javax.ws.rs.core.MediaType;
 
 
 public class TestAPI {
+ApiData apiData;
+LoginData loginData;
+RegistrationData registrationData;
+RegistryData registryData;
+UserData userData;
 
-    @POST
+@BeforeClass
+public void setUp()
+{
+    apiData = new ApiData();
+    loginData = new LoginData();
+    registrationData = new RegistrationData();
+            registryData = new RegistryData();
+            userData = new UserData();
+}
+ /*   @POST
     @Path("/registration")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -59,30 +80,26 @@ public class TestAPI {
         APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONWithInUniqueUsernameForRegistration());
         assertEquals(response.getStatusCode(),400);
     }
-
+*/
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "login-controller")
     public void loginUserSuccess() {
-        Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONForSuccessfulUserAuthorization().toString()).post(APIMethods.targetURL("/login"));
-        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForSuccessfulUserAuthorization());
-        assertEquals(response.getStatusCode(),200);
-        assertTrue(APIMethods.isBodyHasKey(response,"data.token"));
-        assertTrue(APIMethods.setAuthUserToken(APIMethods.takeKeyValue(response,"data.token")));
+        Assert.assertEquals(new APIMethods().post(apiData.DataHeaders("/login"),
+                loginData.loginUser(),200,true).getStatus(),200);
     }
+
+
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "login-controller")
     public void loginMonitorSuccess() {
-        Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getSuccessfulMonitorAuthorization().toString()).post(APIMethods.targetURL("/login"));
-        APIMethods.requestResponseWrite(response,JSONObjectAPI.getSuccessfulMonitorAuthorization());
-        assertEquals(response.getStatusCode(),200);
-        assertTrue(APIMethods.isBodyHasKey(response,"data.token"));
-        assertTrue(APIMethods.setAuthMonitorToken(APIMethods.takeKeyValue(response,"data.token")));
+        Assert.assertEquals(new APIMethods().post(apiData.DataHeaders("/login"),
+                loginData.loginMonitor(),200,true).getStatus(),200);
     }
 
 
@@ -92,11 +109,8 @@ public class TestAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "login-controller")
     public void loginAdminSuccess() {
-        Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONForSuccessfulAdminAuthorization().toString()).post(APIMethods.targetURL("/login"));
-        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForSuccessfulAdminAuthorization());
-        assertEquals(response.getStatusCode(),200);
-        assertTrue(APIMethods.isBodyHasKey(response,"data.token"));
-        assertTrue(APIMethods.setAuthAdminToken(APIMethods.takeKeyValue(response,"data.token")));
+        Assert.assertEquals(new APIMethods().post(apiData.DataHeaders("/login"),
+                loginData.loginAdmin(),200,true).getStatus(),200);
     }
 
     @POST
@@ -105,11 +119,10 @@ public class TestAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Test (groups = "login-controller")
     public void loginInvalid() {
-        Response response = RestAssured.given().contentType(ContentType.JSON).body(JSONObjectAPI.getJSONForInvalidAuthorization().toString()).post(APIMethods.targetURL("/login"));
-        APIMethods.requestResponseWrite(response,JSONObjectAPI.getJSONForInvalidAuthorization());
-        assertEquals(response.getStatusCode(),401);
+        Assert.assertEquals(new APIMethods().post(apiData.DataHeaders("/login"),
+                loginData.loginInvalidPass(),401,true).getStatus(),401);
     }
-
+ /*
     @GET
     @Path("/schedule")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -457,5 +470,5 @@ public void getRegistrySuccess()
         APIMethods.responseWrite(response);
         assertEquals(response.getStatusCode(),200);
     }
-
+*/
 }
